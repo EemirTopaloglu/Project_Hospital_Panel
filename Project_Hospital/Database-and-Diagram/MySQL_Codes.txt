@@ -1,0 +1,314 @@
+
+CREATE TABLE :  
+
+CREATE TABLE User (
+    userID INT PRIMARY KEY,
+    email VARCHAR(100) NOT NULL,
+    password VARCHAR(100) NOT NULL,
+    fullName VARCHAR(100) NOT NULL,
+    phone VARCHAR(20),
+    address VARCHAR(200),
+    isPatient BOOLEAN NOT NULL DEFAULT FALSE,
+    isDoctor BOOLEAN NOT NULL DEFAULT FALSE,
+    isStaff BOOLEAN NOT NULL DEFAULT FALSE
+);
+
+CREATE TABLE Patient (
+    userID INT PRIMARY KEY,
+    birthDate DATE,
+    gender VARCHAR(10),
+    insurancePolId VARCHAR(50),
+    FOREIGN KEY (userID) REFERENCES User(userID)
+);
+
+CREATE TABLE Staff (
+    userID INT PRIMARY KEY,          
+    role VARCHAR(50),
+    FOREIGN KEY (userID)     REFERENCES User(userID)
+);
+CREATE TABLE Allergies (
+    userID INT,
+    alID INT,
+    allergyName VARCHAR(100),
+    PRIMARY KEY (userID, alID),
+    FOREIGN KEY (userID) REFERENCES Patient(userID)
+);
+CREATE TABLE Department (
+    departmentID INT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    specialty VARCHAR(100),
+    medManagerID INT,
+    adManagerID INT,
+    FOREIGN KEY (medManagerID) REFERENCES User(userID),  
+    FOREIGN KEY (adManagerID)  REFERENCES Staff(userID)   
+);
+
+CREATE TABLE Doctor (
+    userID INT PRIMARY KEY,       
+    workingIn INT,
+    specialty VARCHAR(100),
+    FOREIGN KEY (userID)     REFERENCES User(userID),
+    FOREIGN KEY (workingIn) REFERENCES Department(departmentID)
+);
+
+CREATE TABLE Laboratory (
+    labID INT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    connectedDept INT NOT NULL,
+    phone VARCHAR(20),
+    respDoctorID INT,  
+    respSID INT,
+    FOREIGN KEY (connectedDept)        REFERENCES Department(departmentID),
+    FOREIGN KEY (respDoctorID) REFERENCES Doctor(userID),
+    FOREIGN KEY (respSID)  REFERENCES Staff(userID)
+);
+
+CREATE TABLE Report (
+    reportID INT PRIMARY KEY,
+    diagnosis VARCHAR(200),
+    billing DECIMAL(10,2)
+);
+
+CREATE TABLE Visit (
+    patientID INT,
+    doctorID INT,
+    date DATE,
+    time TIME,
+    status VARCHAR(20),
+    reportID INT,
+    PRIMARY KEY (patientID, doctorID, date, time),
+    FOREIGN KEY (patientID) REFERENCES Patient(userID),
+    FOREIGN KEY (doctorID) REFERENCES Doctor(userID),
+    FOREIGN KEY (reportID) REFERENCES Report(reportID)
+);
+
+
+CREATE TABLE Medications(
+    prescriptionID INT,
+    medicationName VARCHAR(100),
+    dosageInstruction VARCHAR(200),
+    PRIMARY KEY(prescriptionId,MedicationName)
+);
+
+CREATE TABLE Test (
+    patientID INT,
+    doctorID INT,
+    date DATE,
+    time TIME,
+    name VARCHAR(100),
+    labID INT,
+    result VARCHAR(200),
+    prescriptionID INT,
+    PRIMARY KEY (patientID, doctorID, date, time, name),
+    FOREIGN KEY (patientID, doctorID, date, time) REFERENCES Visit(patientID, doctorID, date, time),
+    FOREIGN KEY (labID) REFERENCES Laboratory(labID),
+    FOREIGN KEY (prescriptionID) REFERENCES Medications(prescriptionID)
+);
+
+INSERT VALUES:
+
+INSERT INTO User(userID, email, password, fullName, phone, address, isPatient, isDoctor, isStaff)
+VALUES
+-- Patients (1–10)
+( 1, 'alice.brown@example.com',    'pass1',  'Alice Brown',   '555-0101', '123 Main St', TRUE,  FALSE, FALSE),
+( 2, 'bob.johnson@example.com',    'pass2',  'Bob Johnson',   '555-0102', '456 Oak St',  TRUE,  FALSE, FALSE),
+( 3, 'carol.williams@example.com', 'pass3',  'Carol Williams','555-0103', '789 Pine St', TRUE,  FALSE, FALSE),
+( 4, 'david.jones@example.com',    'pass4',  'David Jones',   '555-0104', '246 Maple St',TRUE,  FALSE, FALSE),
+( 5, 'eva.miller@example.com',     'pass5',  'Eva Miller',    '555-0105', '135 Elm St',  TRUE,  FALSE, FALSE),
+( 6, 'frank.davis@example.com',    'pass6',  'Frank Davis',   '555-0106', '864 Cedar St',TRUE,  FALSE, FALSE),
+( 7, 'grace.wilson@example.com',   'pass7',  'Grace Wilson',  '555-0107', '975 Birch St',TRUE,  FALSE, FALSE),
+( 8, 'henry.moore@example.com',    'pass8',  'Henry Moore',   '555-0108', '642 Walnut St',TRUE, FALSE, FALSE),
+( 9, 'isabel.taylor@example.com',  'pass9',  'Isabel Taylor', '555-0109', '357 Spruce St',TRUE,FALSE, FALSE),
+(10, 'jack.anderson@example.com',  'pass10', 'Jack Anderson', '555-0110', '864 Chestnut St',TRUE,FALSE,FALSE),
+
+(11,'emily.clark@example.com',     'pass11','Dr. Emily Clark',    '555-0111','111 Health Rd', FALSE,TRUE, FALSE),
+(12,'michael.thompson@example.com','pass12','Dr. Michael Thompson','555-0112','222 Wellness Ave',FALSE,TRUE,FALSE),
+(13,'sarah.martinez@example.com',  'pass13','Dr. Sarah Martinez', '555-0113','333 Care Blvd',    FALSE,TRUE,FALSE),
+(14,'james.robinson@example.com',  'pass14','Dr. James Robinson', '555-0114','444 Clinic St',    FALSE,TRUE,FALSE),
+(15,'linda.clark@example.com',     'pass15','Dr. Linda Clark',    '555-0115','555 Health St',    FALSE,TRUE,FALSE),
+(16,'patrick.lewis@example.com',   'pass16','Dr. Patrick Lewis',  '555-0116','666 Wellness Rd',  FALSE,TRUE,FALSE),
+(17,'nancy.walker@example.com',    'pass17','Dr. Nancy Walker',   '555-0117','777 Care Ln',      FALSE,TRUE,FALSE),
+(18,'oliver.hall@example.com',     'pass18','Dr. Oliver Hall',    '555-0118','888 Clinic Ave',   FALSE,TRUE,FALSE),
+(19,'paula.young@example.com',     'pass19','Dr. Paula Young',    '555-0119','999 Health Blvd',  FALSE,TRUE,FALSE),
+(20,'quentin.king@example.com',    'pass20','Dr. Quentin King',   '555-0120','1001 Wellness St', FALSE,TRUE,FALSE),
+
+(21,'tech1@example.com',     'pass21','Tech One',         '555-0121','12 Lab St',         FALSE,FALSE,TRUE),
+(22,'tech2@example.com',     'pass22','Tech Two',         '555-0122','34 Lab Ave',        FALSE,FALSE,TRUE),
+(23,'reception1@example.com','pass23','Receptionist One', '555-0123','56 Front St',       FALSE,FALSE,TRUE),
+(24,'reception2@example.com','pass24','Receptionist Two', '555-0124','78 Front Ave',      FALSE,FALSE,TRUE),
+(25,'admin1@example.com',    'pass25','Admin One',        '555-0125','90 Admin Rd',       FALSE,FALSE,TRUE),
+(26,'admin2@example.com',    'pass26','Admin Two',        '555-0126','12 Admin St',       FALSE,FALSE,TRUE),
+(27,'tech3@example.com',     'pass27','Tech Three',       '555-0127','34 Lab Blvd',       FALSE,FALSE,TRUE),
+(28,'tech4@example.com',     'pass28','Tech Four',        '555-0128','56 Lab Ln',         FALSE,FALSE,TRUE),
+(29,'staff9@example.com',    'pass29','Staff Nine',       '555-0129','78 Staff St',       FALSE,FALSE,TRUE),
+(30,'staff10@example.com',   'pass30','Staff Ten',        '555-0130','90 Staff Ave',      FALSE,FALSE,TRUE);
+
+
+INSERT INTO Patient(userID, birthDate, gender, insurancePolId)
+VALUES
+(1,'1980-01-15','Female','POL1001'),
+(2,'1975-07-20','Male',  'POL1002'),
+(3,'1990-03-05','Female','POL1003'),
+(4,'1985-12-12','Male',  'POL1004'),
+(5,'2000-06-30','Female','POL1005'),
+(6,'1995-11-22','Male',  'POL1006'),
+(7,'1970-02-14','Female','POL1007'),
+(8,'1965-09-09','Male',  'POL1008'),
+(9,'1988-08-08','Female','POL1009'),
+(10,'1992-04-04','Male', 'POL1010');
+
+
+INSERT INTO Staff(userID, role)
+VALUES
+(21,'Lab Technician'),
+(22,'Lab Technician'),
+(23,'Receptionist'),
+(24,'Receptionist'),
+(25,'Administrator'),
+(26,'Administrator'),
+(27,'Lab Technician'),
+(28,'Lab Technician'),
+(29,'Accountant'),
+(30,'Administrator');
+
+INSERT INTO Department(departmentID, name, specialty, medManagerID, adManagerID)
+VALUES
+(1,'Cardiology',      'Heart',               11,21),
+(2,'Oncology',        'Cancer',              12,22),
+(3,'Neurology',       'Nervous System',      13,23),
+(4,'Pediatrics',      'Children',            14,24),
+(5,'Orthopedics',     'Bones',               15,25),
+(6,'Dermatology',     'Skin',                16,26),
+(7,'Gynecology',      'Female Reproductive', 17,27),
+(8,'Radiology',       'Imaging',             18,28),
+(9,'Emergency',       'Acute Care',          19,29),
+(10,'Gastroenterology','Digestive System',   20,30);
+
+
+INSERT INTO Doctor(userID, workingIn, specialty)
+VALUES
+-- Dept 1 has 6 doctors
+(11,1,'Cardiology'),
+(12,1,'Cardiology'),
+(13,1,'Cardiology'),
+(14,1,'Cardiology'),
+(15,1,'Cardiology'),
+(16,1,'Cardiology'),
+-- the rest
+(17,2,'Oncology'),
+(18,3,'Neurology'),
+(19,4,'Pediatrics'),
+(20,5,'Orthopedics');
+
+INSERT INTO Laboratory(labID, name,        connectedDept, phone,     respDoctorID, respSID)
+VALUES
+(1,'Central Lab',   1,'555-1001',11,21),
+(2,'North Lab',     2,'555-1002',12,22),
+(3,'East Lab',      3,'555-1003',13,23),
+(4,'West Lab',      4,'555-1004',14,24),
+(5,'South Lab',     5,'555-1005',15,25),
+(6,'Cardio Lab',    1,'555-1006',16,26),
+(7,'Onco Lab',      2,'555-1007',17,27),
+(8,'Neuro Lab',     3,'555-1008',18,28),
+(9,'Pedia Lab',     4,'555-1009',19,29),
+(10,'Ortho Lab',    5,'555-1010',20,30);
+
+INSERT INTO Report(reportID, diagnosis,   billing)
+VALUES
+(1,'Hypertension',           200.00),
+(2,'Diabetes',               150.00),
+(3,'Migraine',               120.00),
+(4,'Asthma',                 180.00),
+(5,'Fracture',               500.00),
+(6,'Eczema',                 130.00),
+(7,'PCOS',                   140.00),
+(8,'Broken Arm',             600.00),
+(9,'Ulcer',                  220.00),
+(10,'Flu',                    90.00);
+
+INSERT INTO Medications(prescriptionID, medicationName,       dosageInstruction)
+VALUES
+(1, 'Aspirin',      '100 mg once daily'),
+(2, 'Ibuprofen',    '200 mg every 6 hours'),
+(3, 'Paracetamol',  '500 mg every 8 hours'),
+(4, 'Amoxicillin',  '500 mg every 12 hours'),
+(5, 'Atorvastatin', '20 mg once nightly'),
+(6, 'Lisinopril',   '10 mg once daily'),
+(7, 'Metformin',    '500 mg twice daily'),
+(8, 'Omeprazole',   '20 mg before meals'),
+(9, 'Levothyroxine','75 mcg every morning'),
+(10,'Prednisone',   '10 mg every morning'),
+(11,'Tramadol',     '50 mg every 6 hours as needed'),
+(12,'Warfarin',     '5 mg once daily'),
+(13,'Simvastatin',  '20 mg once nightly'),
+(14,'Losartan',     '50 mg once daily'),
+(15,'Metoprolol',   '50 mg twice daily');
+
+INSERT INTO Allergies(userID, alID, allergyName)
+VALUES
+(1,1,'Peanuts'),    (1,2,'Shellfish'),
+(2,1,'Pollen'),     (2,2,'Dust'),
+(3,1,'Latex'),      (3,2,'Bee Sting'),
+(4,1,'Penicillin'), (4,2,'Soy'),
+(5,1,'Gluten'),     (5,2,'Dairy'),
+(6,1,'Cats'),       (6,2,'Mold'),
+(7,1,'Eggs'),       (7,2,'Fish'),
+(8,1,'Corn'),       (8,2,'Wheat'),
+(9,1,'Fragrance'),  (9,2,'Nickel'),
+(10,1,'Sulfa'),     (10,2,'Insecticide');
+
+INSERT INTO Visit(patientID, doctorID, date,       time,     status,     reportID)
+VALUES
+-- (a) Scheduled in April --
+( 1,11,'2025-04-01','09:00:00','Scheduled',NULL),
+( 1,12,'2025-04-02','10:00:00','Scheduled',NULL),
+( 1,13,'2025-04-03','11:00:00','Scheduled',NULL),
+( 1,14,'2025-04-04','14:00:00','Scheduled',NULL),
+
+( 2,11,'2025-04-02','09:30:00','Scheduled',NULL),
+( 2,12,'2025-04-03','10:30:00','Scheduled',NULL),
+( 2,13,'2025-04-04','11:30:00','Scheduled',NULL),
+
+( 3,14,'2025-04-03','09:45:00','Scheduled',NULL),
+( 3,15,'2025-04-04','10:45:00','Scheduled',NULL),
+( 3,11,'2025-04-05','11:45:00','Scheduled',NULL),
+
+( 4,12,'2025-04-04','08:00:00','Scheduled',NULL),
+( 4,13,'2025-04-05','09:00:00','Scheduled',NULL),
+
+( 5,14,'2025-04-05','10:00:00','Scheduled',NULL),
+
+( 6,15,'2025-04-06','15:00:00','Scheduled',NULL),
+( 6,11,'2025-04-07','16:00:00','Scheduled',NULL),
+
+( 1,11,'2025-04-28','09:00:00','Completed',1),
+( 2,12,'2025-04-29','10:00:00','Completed',2),
+( 3,13,'2025-04-30','11:00:00','Completed',3),
+( 4,14,'2025-05-01','14:00:00','Completed',4),
+( 5,15,'2025-05-02','15:00:00','Completed',5),
+( 7,11,'2025-04-28','16:00:00','Completed',6),
+( 7,12,'2025-05-03','17:00:00','Completed',7),
+
+( 7,13,'2025-03-01','09:00:00','Cancelled',NULL),
+( 7,14,'2025-03-02','10:00:00','Cancelled',NULL),
+( 7,15,'2025-03-03','11:00:00','Cancelled',NULL),
+( 7,16,'2025-03-04','12:00:00','Cancelled',NULL);
+
+INSERT INTO Test(patientID, doctorID, date,       time,       name,       labID, result,           prescriptionID)
+VALUES
+(1,11,'2025-04-01','09:00:00','Blood Test',  1,'Normal',             1),
+(1,12,'2025-04-02','10:00:00','X-Ray',       2,'Clear',             2),
+(1,13,'2025-04-03','11:00:00','MRI',         3,'No issues',         3),
+(1,14,'2025-04-04','14:00:00','CT Scan',     4,'Normal',            4),
+(2,11,'2025-04-02','09:30:00','Ultrasound',  5,'Normal',            5),
+(2,12,'2025-04-03','10:30:00','Blood Test',  1,'High cholesterol',  6),
+(2,13,'2025-04-04','11:30:00','X-Ray',       2,'Fracture',          7),
+(3,14,'2025-04-03','09:45:00','MRI',         3,'Abnormal',          8),
+(3,15,'2025-04-04','10:45:00','CT Scan',     4,'Normal',            9),
+(3,11,'2025-04-05','11:45:00','Ultrasound',  5,'Cysts',            10),
+(4,12,'2025-04-04','08:00:00','Blood Test',  1,'Anemia',           11),
+(4,13,'2025-04-05','09:00:00','X-Ray',       2,'Normal',           12),
+(5,14,'2025-04-05','10:00:00','MRI',         3,'No abnormalities', 13),
+(6,15,'2025-04-06','15:00:00','CT Scan',     4,'Normal',           14),
+(6,11,'2025-04-07','16:00:00','Blood Test',  1,'Elevated WBC',     15);
+
